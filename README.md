@@ -23,7 +23,7 @@ For Node.js projects
 ## Examples
 
 ```js
-var watch = require('async-watch").AsyncWatch; // not needed for browsers
+var watch = require('async-watch').AsyncWatch; // not needed for browsers
 var obj = {}; // creating an empty object
 AsyncWatch(obj, 'a.b.c', function(value){
     console.log(value);
