@@ -2,15 +2,16 @@
 
 # async-watch
 
-AsyncWatch is a small library for watching javascript/node.js objects. It is using Object.defineProperty which makes it compatible with most browsers. 
+AsyncWatch is a small library for watching javascript/node.js objects. It uses Object.defineProperty which makes it compatible with most browsers. 
 
 ## Features
 
  * Asynchronous execution (trigges changes on animationFrame)
  * Nested object watching
- * Restoring watchers after an object is destroyed
- * No dirty watchers
+ * Restoring watchers after objects are destroyed
+ * No dirty hacks
  * Suitable for angular-like frameworks
+ * Good test coverage
  
 ## Install
 
@@ -30,6 +31,8 @@ var obj = {}; // creating an empty object
 AsyncWatch(obj, 'a.b.c', function(value){
     console.log('set', value);
 });
+// You can pass an array as well
+//AsyncWatch(obj, ['a', 'b', 'c'])
 ```
  
  As you can see here, we start with an empty object. AsyncWatch will set a watcher on property "a", which knows about its descendands
