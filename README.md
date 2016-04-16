@@ -19,12 +19,28 @@ For browser:
 For Node.js projects
   
     npm install async-watch --save
-    
-To run tests
 
-    npm test
-or:
-
-    mocha
-    
 ## Examples
+
+```js
+var watch = require('async-watch").AsyncWatch; // not needed for browsers
+var obj = {}; // creating an empty object
+AsyncWatch(obj, 'a.b.c', function(value){
+    console.log(value);
+});
+```
+ 
+ As you can see here, we start with an empty object. AsyncWatch will set a watcher on property "a", which knows about its descendands
+ 
+ ```js
+  obj.a = {
+   b : {
+    c : 1
+   }
+  };
+  obj.a.b.c = 2;
+  obj.a.b.c = 3;
+ ```
+ 
+ 
+ 
