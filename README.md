@@ -2,13 +2,16 @@
 
 # async-watch
 
-AsyncWatch is a small library for watching javascript/node.js objects. It is using Object.defineProperty which makes it compatible with most browsers. 
+AsyncWatch is a small library for watching javascript/node.js objects. It uses Object.defineProperty which makes it compatible with most browsers. 
 
 ## Features
 
  * Asynchronous execution (trigges changes on animationFrame)
  * Nested object watching
- * Restoring watchers after an object is destroyed
+ * Restoring watchers after objects are destroyed
+ * No dirty hacks
+ * Suitable for angular-like frameworks
+ * Good test coverage
  
 ## Install
 
@@ -26,8 +29,10 @@ For Node.js projects
 var watch = require('async-watch').AsyncWatch; // not needed for browsers
 var obj = {}; // creating an empty object
 AsyncWatch(obj, 'a.b.c', function(value){
-    console.log(value);
+    console.log('set', value);
 });
+// You can pass an array as well
+//AsyncWatch(obj, ['a', 'b', 'c'])
 ```
  
  As you can see here, we start with an empty object. AsyncWatch will set a watcher on property "a", which knows about its descendands
@@ -41,6 +46,22 @@ AsyncWatch(obj, 'a.b.c', function(value){
   obj.a.b.c = 2;
   obj.a.b.c = 3;
  ```
+ 
+ The output will look like this:
+ 
+ ```js 
+ set undefined
+ set 3
+ ```
+ 
+First set happens when AsyncWatch is initialized, after that the program waits for the next available frame to trigger changes.
+ 
+ 
+## Contribution
+ Contribution is greatly appreciated! Please, run tests before submitting a pool request.  
+ 
+### Known issues
+ https://github.com/wiresjs/async-watch/blob/master/test/corner_case.js#L54
  
  
  
