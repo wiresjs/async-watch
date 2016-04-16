@@ -33,38 +33,49 @@
 
 
 var obj = {
-
+   a: {
+      b : 0
+   }
 };
 var results = [];
-AsyncWatch(obj, 'a.b.c', function(value) {
-   console.log(">>FIRST",value)
+AsyncWatch(obj, 'a.b', function(value) {
+   console.log(value)
 });
+
+obj.a.b = 1;
+obj.a.b = 100;
+obj.a = {
+   b : 0
+}
+
+
+
+
+
+
+
+
+
+// var obj = {};
+// var results = [];
 // AsyncWatch(obj, 'a.b.c', function(value) {
-//    console.log(">>SECOND",value)
+//    console.log('FIRST >>',value)
+//    results.push(value);
 // });
-
-
-
-
-setTimeout(function(){
-   obj.a = {
-      b : {
-
-      }
-   }
-   setTimeout(function(){
-      obj.a = {
-         b : {
-            c : 5
-         }
-      }
-   },0)
-},0)
-
-//obj.a.b.c = 2;
-
-
-
+// AsyncWatch(obj, 'a.b.c', function(value) {
+//    console.log('SECOND >>',value)
+//    results.push(value);
+// });
+// obj.a = {
+//    b: {
+//       c: 1
+//    }
+// };
+// console.log(obj)
+// setTimeout(function() {
+//    obj.a.b.c = 2;
+//    console.log(obj)
+// }, 0)
 </script>
 </body>
 </html>

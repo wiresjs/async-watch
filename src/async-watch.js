@@ -26,13 +26,14 @@
       return obj;
    }
 
-   var nextFrame = {
+   var TaskPool = {
       jobs: {},
       scheduled: false,
-      register: function(k, cb) {
+      add: function(k, cb, $scope) {
          var self = this;
          //console.log("JOB ADDED", k);
-         self.jobs[k] = cb;
+
+         self.jobs[k] = $scope ? cb.bind($scope) : cb;
          if (self.scheduled === false) {
             self.scheduled = true;
             nextTick(function() {
@@ -49,6 +50,7 @@
          }
       }
    }
+
    var idCounter = 0;
    var AsyncWatch = function(self, userPath, callback, preventInitial) {
       if (typeof self !== 'object' || typeof callback !== 'function') {
@@ -123,28 +125,35 @@
             // Trigger Descendants
             for (var descendantKey in $prop.$descendants) {
                if ($prop.$descendants.hasOwnProperty(descendantKey)) {
-                  for (var i = 0; i < $prop.$descendants[descendantKey].length; i++) {
-                     var descendant = $prop.$descendants[descendantKey][i];
-                     descendant.callback(getPropertyValue(value, descendantKey), oldValue)
-                     var job_id = $id + descendantKey;
+                  for (var i in $prop.$descendants[descendantKey].callbacks) {
+                     var descendantCallback = $prop.$descendants[descendantKey].callbacks[i];
+                     var job_id = $id + descendantKey + i;
 
-                     // register a binder (an object was destroyed)
-                     // Postpone the binding (cuz at this moment object is undefined)
-                     nextFrame.register(job_id, function() {
-                        descendant.bindWatcher();
+                     TaskPool.add(job_id, function() {
+                        this.cb(getPropertyValue(value, this.key), oldValue);
+                     }, {
+                        key: descendantKey,
+                        cb: descendantCallback
                      });
                   }
+                  TaskPool.add($id + descendantKey, function() {
+                     this.$prop.$descendants[this.descendantKey].bindWatcher();
+                  }, {
+                     $prop: $prop,
+                     descendantKey: descendantKey
+                  });
                }
             }
             if ($isSingleProperty) {
                // Trigger $self watchers
-               var job_id = $id + root;
-               nextFrame.register(job_id, function() {
-                  for (var i = 0; i < $prop.$self.length; i++) {
-                     if ($prop.$self.hasOwnProperty(i)) {
-                        $prop.$self[i](value, oldValue);
+               TaskPool.add($id + root, function() {
+                  for (var i = 0; i < this.$prop.$self.length; i++) {
+                     if (this.$prop.$self.hasOwnProperty(i)) {
+                        this.$prop.$self[i](value, oldValue);
                      }
                   }
+               }, {
+                  $prop: $prop
                });
             }
          }
@@ -159,32 +168,27 @@
       } else {
          // We need to watch descendants
          if (!$prop.$descendants[descendantsPath]) {
-            $prop.$descendants[descendantsPath] = [];
-         }
-         // myDescendant
-         // If initial request is a.b.c.d
-         // myDescendant is b.c.d
-         var myDescendant = {
-            callback: callback,
-            bindWatcher: function() {
-               // The actual watcher that is need for us
-               if (self.hasOwnProperty(root) && self[root] !== undefined) {
-                  // we want NEW data only here.
-                  // Initial callback has been triggered
-                  AsyncWatch(self[root], descendantsArray, function(value, oldValue) {
-                     for (var i = 0; i < $prop.$descendants[descendantsPath].length; i++) {
-                        $prop.$descendants[descendantsPath][i].callback(value, oldValue);
-                     }
-                  }, true); // We don't want to call another callback here
+            $prop.$descendants[descendantsPath] = {
+               callbacks: [callback],
+               bindWatcher: function() {
+                  if (self.hasOwnProperty(root) && self[root] !== undefined) {
+                     // we want NEW data only here.
+                     // Initial callback has been triggered
+                     AsyncWatch(self[root], descendantsArray, function(value, oldValue) {
+                        for (var i = 0; i < $prop.$descendants[descendantsPath].callbacks.length; i++) {
+                           $prop.$descendants[descendantsPath].callbacks[i](value, oldValue);
+                        }
+                     }, true); // We don't want to call another callback here
+                  }
                }
-
             }
+            $prop.$descendants[descendantsPath].bindWatcher();
+         } else {
+            $prop.$descendants[descendantsPath].callbacks.push(callback);
          }
-         $prop.$descendants[descendantsPath].push(myDescendant);
          if (!preventInitial) {
-            myDescendant.callback(getPropertyValue(self[root], descendantsArray))
+            callback(getPropertyValue(self[root], descendantsArray))
          }
-         myDescendant.bindWatcher();
       }
    }
    Exports.AsyncWatch = AsyncWatch;
