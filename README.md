@@ -45,20 +45,19 @@ AsyncWatch(obj, 'a.b.c', function(value){
  ```
  
  The output will look like this:
- ```
+ 
+ ```js 
  set undefined
  set 3
  ```
  
- First set happens when AsyncWatch is initialized, after that the program waits for the next available frame to trigger changes.
+First set happens when AsyncWatch is initialized, after that the program waits for the next available frame to trigger changes.
  
  
- ## Contribute
+## Contribution
+ Contribution is greatly appreciated! Please, run tests before submitting a pool request.  
  
- Contribution is greatly appreciated! Please, run tests before submitting pool request.  
- 
- ### Know issues
- 
+### Known issues
  https://github.com/wiresjs/async-watch/blob/master/test/corner_case.js#L54
  
  
