@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head >
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+
+<title>AsyncWatch</title>
+<script src="/async-watch.js"></script>
+
+<body >
+<script>
+// var obj = {
+//    a : {
+//       b : {
+//          c : 1
+//       }
+//    }
+// };
+// obj.a.b.c = 2;
+// AsyncWatch(obj,'a.b.c', function(value){
+//    console.log(">>", value)
+// })
+//
+// setTimeout(function(){
+//    //obj.a.b.c++;
+//
+//    obj.a = {};
+// },100)
+
+
+var obj = {
+
+};
+var results = [];
+AsyncWatch(obj, 'a.b.c', function(value) {
+   console.log(">>FIRST",value)
+});
+// AsyncWatch(obj, 'a.b.c', function(value) {
+//    console.log(">>SECOND",value)
+// });
+
+
+
+
+setTimeout(function(){
+   obj.a = {
+      b : {
+
+      }
+   }
+   setTimeout(function(){
+      obj.a = {
+         b : {
+            c : 5
+         }
+      }
+   },0)
+},0)
+
+//obj.a.b.c = 2;
+
+
+
+</script>
+</body>
+</html>
