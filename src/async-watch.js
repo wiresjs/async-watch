@@ -2,13 +2,49 @@
    if (isNode) {
       Exports = module.exports;
    }
+
+   // Make is compatable with node.js
    var nextTick = isNode ? process.nextTick : Exports.requestAnimationFrame;
 
+   /**
+    * dotNotation - A helper to extract dot notation
+    *
+    * @param  {type} path string or array
+    * @return {type}      Object { path : ['a','b'], str : 'a.b'}
+    */
+   function dotNotation(path) {
+      if (path instanceof Array) {
+         return {
+            path: path,
+            str: path.join('.')
+         }
+      }
+      if (typeof path !== 'string') {
+         return;
+      }
+      return {
+         path: path.split('\.'),
+         str: path
+      }
+   }
+
+   /**
+    * getPropertyValue - get a value from an object with dot notation
+    *
+    * @param  {type} obj  Target object
+    * @param  {type} path dot notation
+    * @return {type}      Target object
+    */
    function getPropertyValue(obj, path) {
+
       if (path.length === 0 || obj === undefined) {
          return undefined;
       }
-      path = path instanceof Array ? path : path.split('\.');
+      var notation = dotNotation(path);
+      if (!notation) {
+         return;
+      }
+      path = notation.path;
       for (var i = 0; i < path.length; i++) {
          obj = obj[path[i]];
          if (obj === undefined) {
@@ -18,6 +54,14 @@
       return obj;
    }
 
+   /**
+    * setHiddenProperty - description
+    *
+    * @param  {type} obj   target object
+    * @param  {type} key   property name
+    * @param  {type} value default value
+    * @return {type}       target object
+    */
    function setHiddenProperty(obj, key, value) {
       Object.defineProperty(obj, key, {
          enumerable: false,
@@ -26,9 +70,22 @@
       return obj;
    }
 
+   /**
+    * Postpones execution until the next frame
+    * Overrides keys with the newest callback
+    */
    var TaskPool = {
       jobs: {},
       scheduled: false,
+
+      /**
+       * add - Adding callback to a pool
+       *
+       * @param  {type} k      User key
+       * @param  {type} cb     Callback
+       * @param  {type} $scope Defined scope (will be bound automatically)
+       * @return {type}
+       */
       add: function(k, cb, $scope) {
          var self = this;
          //console.log("JOB ADDED", k);
@@ -52,24 +109,32 @@
    }
 
    var idCounter = 0;
+
+   /**
+    *  AsyncWatch
+    *  AsyncWatch is a small library for watching javascript/node.js objects.
+    *  It uses Object.defineProperty which makes it compatible with most browsers.
+    *
+    * @param  {type} self           Terget object
+    * @param  {type} userPath       dot notation
+    * @param  {type} callback       User callback
+    * @param  {type} preventInitial System variable to prevent initial callback
+    * @return {type}
+    */
    var AsyncWatch = function(self, userPath, callback, preventInitial) {
       if (typeof self !== 'object' || typeof callback !== 'function') {
          return;
       }
-      var original;
-      var originStringUserPath = userPath;
-      if (userPath instanceof Array) {
-         original = userPath;
-         originStringUserPath = userPath.join(".");
-      } else {
-         if (typeof userPath === "string") {
-            original = userPath.split('\.')
-         } else {
-            return;
-         }
+      var notation = dotNotation(userPath);
+      if (!notation) {
+         return;
       }
+
+      var original = notation.path;
+      var originStringUserPath = notation.str;;
       // root (a.b.c.d -> gives a)
       var root = original[0];
+
       // Copy of original array
       var keys = [];
       for (var i = 0; i < original.length; i++) {
