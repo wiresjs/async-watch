@@ -1,12 +1,13 @@
 [![Build Status](https://travis-ci.org/wiresjs/async-watch.svg?branch=master)](https://travis-ci.org/wiresjs/async-watch)
-
+[![Documentation Status](https://readthedocs.org/projects/async-watch/badge/?version=latest)](http://async-watch.readthedocs.org/en/latest/?badge=latest)
+  
 # async-watch
 
 AsyncWatch is a small library for watching javascript/node.js objects. It uses Object.defineProperty which makes it compatible with most browsers. 
 
 ## Features
 
- * Asynchronous execution (trigges changes on animationFrame)
+ * Asynchronous execution (Changes are triggerd on requestAnimationFrame)
  * Nested object watching
  * Restoring watchers after objects are destroyed
  * No dirty hacks
