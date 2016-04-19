@@ -66,6 +66,3 @@ Worth mentioning: Transactions happen on demand, without "perpetual" loop or/and
 
 ## Contribution
  Contribution is greatly appreciated! Please, run tests before submitting a pool request.  
-
-### Known issues
- https://github.com/wiresjs/async-watch/blob/master/test/corner_case.js#L54
