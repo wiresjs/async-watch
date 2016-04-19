@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/wiresjs/async-watch.svg?branch=master)](https://travis-ci.org/wiresjs/async-watch)
-[![Documentation Status](https://readthedocs.org/projects/async-watch/badge/?version=latest)](http://async-watch.readthedocs.org/en/latest/?badge=latest)
 
 # async-watch
 
@@ -27,7 +26,7 @@ For Node.js projects
 ## Examples
 
 ```js
-var watch = require('async-watch').AsyncWatch; // not needed for browsers
+var AsyncWatch = require('async-watch').AsyncWatch; // not needed for browsers
 var obj = {}; // creating an empty object
 AsyncWatch(obj, 'a.b.c', function(value){
     console.log('set', value);
