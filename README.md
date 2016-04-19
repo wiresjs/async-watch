@@ -64,4 +64,4 @@ Worth mentioning: Transactions happen on demand, without "perpetual" loop or/and
 
 
 ## Contribution
- Contribution is greatly appreciated! Please, run tests before submitting a pool request.  
+ Contribution is greatly appreciated! Please, run tests before submitting a pull request.  
