@@ -13,69 +13,20 @@
 
 <body >
 <script>
-// var obj = {
-//    a : {
-//       b : {
-//          c : 1
-//       }
-//    }
-// };
-// obj.a.b.c = 2;
-// AsyncWatch(obj,'a.b.c', function(value){
-//    console.log(">>", value)
-// })
-//
-// setTimeout(function(){
-//    //obj.a.b.c++;
-//
-//    obj.a = {};
-// },100)
-
-
-var obj = {
-   a: {
-      b : 0
-   }
-};
-var results = [];
-AsyncWatch(obj, 'a.b', function(value) {
-   console.log(value)
+var obj = {}; // creating an empty object
+AsyncWatch(obj, 'a.b.c', function(value){
+    console.log('set', value);
 });
-
-obj.a.b = 1;
-obj.a.b = 100;
 obj.a = {
-   b : 0
-}
-
-
-
-
-
-
-
-
-
-// var obj = {};
-// var results = [];
-// AsyncWatch(obj, 'a.b.c', function(value) {
-//    console.log('FIRST >>',value)
-//    results.push(value);
-// });
-// AsyncWatch(obj, 'a.b.c', function(value) {
-//    console.log('SECOND >>',value)
-//    results.push(value);
-// });
-// obj.a = {
-//    b: {
-//       c: 1
-//    }
-// };
-// console.log(obj)
-// setTimeout(function() {
-//    obj.a.b.c = 2;
-//    console.log(obj)
-// }, 0)
+ b : {
+  c : 1
+ }
+};
+obj.a.b.c = 2;
+obj.a.b.c = 3;
+setTimeout(function(){
+   obj.a.b.c = 4;
+},0)
 </script>
 </body>
 </html>
