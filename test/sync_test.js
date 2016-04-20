@@ -1,0 +1,87 @@
+var should = require('should');
+var watch = require(__dirname + "/../src/async-watch.js").AsyncWatch
+
+describe('Sync test', function() {
+   it("Should sync 2 objects callback", function(done) {
+      var results = [];
+      var obj = {
+         user: {
+            name: "John",
+            age: 1,
+            phone: "my phone"
+         }
+      }
+      obj.user.age = 2;
+      obj.user.age = 3;
+      obj.user.age = 4;
+      obj.user = {
+         name: "John1",
+         age: 100,
+         phone: "my phone1"
+      }
+
+      var thread1 = watch(obj, 'user.name', function(value) {
+         return {
+            name: value
+         };
+      });
+      var thread2 = watch(obj, 'user.age', function(value) {
+         return {
+            age: value
+         };
+      });
+      watch.subscribe([thread1, thread2], function(changes) {
+         results.push(changes);
+      });
+
+      setTimeout(function() {
+         obj.user.age = 3;
+         obj.user.age = 4;
+         obj.user.age = 5;
+      }, 0)
+
+      setTimeout(function() {
+         results.should.deepEqual([{
+            name: 'John1',
+            age: 100
+         }, {
+            age: 5
+         }])
+         done();
+      }, 2)
+
+   });
+
+   it("Should unsubscribe", function(done) {
+      var results = [];
+      var obj = {
+         a: 1
+      }
+      var thread = watch(obj, 'a', function(value) {
+         return {
+            a: value
+         };
+      });
+      var subscription = watch.subscribe([thread], function(changes) {
+         results.push(changes);
+      });
+
+      setTimeout(function() {
+         obj.a = 2;
+      }, 1);
+      setTimeout(function() {
+         subscription.unsubscribe();
+         obj.a = 3;
+      }, 2);
+
+      setTimeout(function() {
+         results.should.deepEqual([{
+            a: 1
+         }, {
+            a: 2
+         }]);
+         done();
+      }, 10)
+   });
+
+})

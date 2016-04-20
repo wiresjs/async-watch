@@ -62,6 +62,47 @@ transaction loop happens when first value is changed.
 
 Worth mentioning: Transactions happen on demand, without "perpetual" loop or/and any other dirty checkers.
 
+## Watching many object
 
+watchAll is not implemented yet, however subscriptions are introduced. Each watcher returns a "transaction" / watcher;
+
+ ```js
+var obj = {
+   a : 1,
+   b : 2
+}
+var watcher1 = AsyncWatch(obj, 'a', function(value) {
+   return {
+      aValue: value
+   };
+});
+var watcher2 = AsyncWatch(obj, 'b', function(value) {
+   return {
+      bValue: value
+   };
+});
+ ```
+
+If you want to track the changes, watchers' callback should return an object;
+
+```js
+var subscription = AsyncWatch.subscribe([watcher1, watcher2], function(changes){
+   console.log(changes)
+})
+```
+Subscribers' callback guarantees all watchers to be in sync.
+
+Outputs:
+```js
+{aValue : 1, bValue: 2 }
+```
+
+Unfortunately, subscriptions will not remove themselves, you need to do it manually.
+
+```js
+subscription.unsubscribe();
+```
+
+To have better understanding check these [tests/sync_test.js](tests)
 ## Contribution
  Contribution is greatly appreciated! Please, run tests before submitting a pull request.  

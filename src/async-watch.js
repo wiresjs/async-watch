@@ -13,7 +13,25 @@
    var AsyncTransaction = {
       jobs: {},
       _signed: {},
+      subscriptions: {},
       scheduled: false,
+      __subscribers: function(subCalls) {
+         // calling subscribers
+         for (var i in subCalls) {
+            if (subCalls.hasOwnProperty(i)) {
+               var changes = {};
+               for (var s in subCalls[i].args) {
+                  var a = subCalls[i].args[s];
+                  if (typeof a === "object") {
+                     for (var changedKey in a) {
+                        changes[changedKey] = a[changedKey];
+                     }
+                  }
+               }
+               subCalls[i].fn.apply(null, [changes]);
+            }
+         }
+      },
       __digest: function() {
          var self = this;
          if (self.scheduled === false) {
@@ -23,19 +41,45 @@
                   self.jobs[i]();
                   delete self.jobs[i];
                }
+               var subCalls = {};
                for (var i in self._signed) {
                   var task = self._signed[i];
-                  task.signed.apply(null, task.target())
+                  var value = task.signed.apply(null, task.target());
+                  // Check for subscriptions
+                  if (self.subscriptions[i]) {
+                     var localId = self.subscriptions[i].$id;
+                     subCalls[localId] = subCalls[localId] || {
+                        args: [],
+                        fn: self.subscriptions[i]
+                     };
+                     subCalls[localId].args.push(value)
+                  }
                   delete self._signed[i];
                }
+               self.__subscribers(subCalls);
                self.scheduled = false;
             });
          }
       },
-      sign: function(signed, target) {
-         if (!signed.$id) {
-            signed.$id = fnIdCounter++;
+      signFunction: function(fn) {
+         fn.$id = fn.$id || fnIdCounter++;
+      },
+      subscribe: function(list, cb) {
+         this.signFunction(cb);
+         for (var i = 0; i < list.length; i++) {
+            var fn = list[i];
+            this.subscriptions[fn.$id] = cb;
          }
+      },
+      unsubscribe: function(list) {
+         for (var i = 0; i < list.length; i++) {
+            var fn = list[i];
+            delete this.subscriptions[fn.$id];
+         }
+      },
+      sign: function(signed, target) {
+         this.signFunction(signed);
+
          if (signed.$instant) {
             return signed.apply(null, target());
          }
@@ -50,6 +94,25 @@
          this.jobs[job_id] = cb;
          return this.__digest();
       }
+   }
+   var Subscribe = function(threads, fn) {
+      var threadCallbacks = [];
+      for (var i in threads) {
+         if (arguments.hasOwnProperty(i)) {
+            var thread = threads[i];
+            threadCallbacks.push(thread.fn);
+         }
+      }
+      AsyncTransaction.subscribe(threadCallbacks, fn);
+      return {
+         unsubscribe: function() {
+            return AsyncTransaction.unsubscribe(threadCallbacks);
+         }
+      }
+   }
+
+   var Watcher = function(fn) {
+      this.fn = fn;
    }
 
    /**
@@ -134,11 +197,13 @@
       if (typeof self !== 'object' || typeof callback !== 'function') {
          return;
       }
+
       var notation = dotNotation(userPath);
       if (!notation) {
          return;
       }
       callback.$id ? callback.$id : fnIdCounter++;
+      var $watcher = new Watcher(callback);
 
       if (instant) {
          callback.$instant = true;
@@ -275,7 +340,10 @@
             return [getPropertyValue(self[root], descendantsArray)];
          });
       }
+      return $watcher;
    }
+   AsyncWatch.subscribe = Subscribe;
    Exports.AsyncWatch = AsyncWatch;
+
    Exports.AsyncTransaction = AsyncTransaction;
 })(typeof module !== 'undefined' && module.exports, this);
