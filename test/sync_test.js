@@ -2,6 +2,30 @@ var should = require('should');
 var watch = require(__dirname + "/../src/async-watch.js").AsyncWatch
 
 describe('Sync test', function() {
+
+   it("Should give an automatic output", function(done) {
+      var results = [];
+      var obj = {
+         user: {
+            name: "John",
+            age: 1,
+            phone: "my phone"
+         }
+      }
+      var thread1 = watch(obj, 'user.name', function(value) {});
+      var thread2 = watch(obj, 'user.age', function(value) {});
+      watch.subscribe([thread1, thread2], function(changes) {
+         results.push(changes);
+      });
+      setTimeout(function() {
+         results.should.deepEqual([{
+            'user.name': 'John',
+            'user.age': 1
+         }]);
+         done();
+      }, 1)
+
+   });
    it("Should sync 2 objects callback", function(done) {
       var results = [];
       var obj = {
@@ -20,16 +44,8 @@ describe('Sync test', function() {
          phone: "my phone1"
       }
 
-      var thread1 = watch(obj, 'user.name', function(value) {
-         return {
-            name: value
-         };
-      });
-      var thread2 = watch(obj, 'user.age', function(value) {
-         return {
-            age: value
-         };
-      });
+      var thread1 = watch(obj, 'user.name', function(value) {});
+      var thread2 = watch(obj, 'user.age', function(value) {});
       watch.subscribe([thread1, thread2], function(changes) {
          results.push(changes);
       });
@@ -41,11 +57,12 @@ describe('Sync test', function() {
       }, 0)
 
       setTimeout(function() {
+
          results.should.deepEqual([{
-            name: 'John1',
-            age: 100
+            'user.name': 'John1',
+            'user.age': 100
          }, {
-            age: 5
+            'user.age': 5
          }])
          done();
       }, 2)

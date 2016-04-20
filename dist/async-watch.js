@@ -20,15 +20,8 @@
          for (var i in subCalls) {
             if (subCalls.hasOwnProperty(i)) {
                var changes = {};
-               for (var s in subCalls[i].args) {
-                  var a = subCalls[i].args[s];
-                  if (typeof a === "object") {
-                     for (var changedKey in a) {
-                        changes[changedKey] = a[changedKey];
-                     }
-                  }
-               }
-               subCalls[i].fn.apply(null, [changes]);
+
+               subCalls[i].fn.apply(null, [subCalls[i].values]);
             }
          }
       },
@@ -44,15 +37,17 @@
                var subCalls = {};
                for (var i in self._signed) {
                   var task = self._signed[i];
-                  var value = task.signed.apply(null, task.target());
+                  var arrayValue = task.target();
+                  task.signed.apply(null, arrayValue);
+
                   // Check for subscriptions
                   if (self.subscriptions[i]) {
                      var localId = self.subscriptions[i].$id;
                      subCalls[localId] = subCalls[localId] || {
-                        args: [],
+                        values: {},
                         fn: self.subscriptions[i]
                      };
-                     subCalls[localId].args.push(value)
+                     subCalls[localId].values[task.signed.$path] = arrayValue[0];
                   }
                   delete self._signed[i];
                }
@@ -203,6 +198,7 @@
          return;
       }
       callback.$id ? callback.$id : fnIdCounter++;
+
       var $watcher = new Watcher(callback);
 
       if (instant) {
@@ -211,6 +207,7 @@
 
       var original = notation.path;
       var originStringUserPath = notation.str;;
+      callback.$path = originStringUserPath;
       // root (a.b.c.d -> gives a)
       var root = original[0];
 

@@ -65,25 +65,17 @@ Worth mentioning: Transactions happen on demand, without "perpetual" loop or/and
 ## Watching many objects
 
 watchAll is not implemented yet, however subscriptions are introduced. Each watcher returns a "transaction" / watcher.
-If you want to track the changes, watchers' callback should return an object;
+
  ```js
 var obj = {
    a : 1,
    b : 2
 }
 var watcher1 = AsyncWatch(obj, 'a', function(value) {
-   return {
-      aValue: value
-   };
 });
 var watcher2 = AsyncWatch(obj, 'b', function(value) {
-   return {
-      bValue: value
-   };
 });
  ```
-
-
 
 ```js
 var subscription = AsyncWatch.subscribe([watcher1, watcher2], function(changes){
@@ -94,7 +86,7 @@ Subscribers' callback guarantees all watchers to be in sync.
 
 Outputs:
 ```js
-{aValue : 1, bValue: 2 }
+{a : 1, b: 2 }
 ```
 
 Unfortunately, subscriptions won't clean up themselves, you need to do it manually.

@@ -13,20 +13,20 @@
 
 <body >
 <script>
-var obj = {}; // creating an empty object
-AsyncWatch(obj, 'a.b.c', function(value){
-    console.log('set', value);
+var obj = {
+   a : 1,
+   b : 2
+}
+var watcher1 = AsyncWatch(obj, 'c.d', function(value) {
 });
-obj.a = {
- b : {
-  c : 1
- }
-};
-obj.a.b.c = 2;
-obj.a.b.c = 3;
-setTimeout(function(){
-   obj.a.b.c = 4;
-},0)
+var watcher2 = AsyncWatch(obj, 'b', function(value) {
+});
+var subscription = AsyncWatch.subscribe([watcher1, watcher2], function(changes){
+   console.log(changes)
+})
+obj.c = {
+   d : 5
+}
 </script>
 </body>
 </html>
