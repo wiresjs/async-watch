@@ -103,6 +103,6 @@ Unfortunately, subscriptions will not remove themselves, you need to do it manua
 subscription.unsubscribe();
 ```
 
-To have better understanding check these [tests/sync_test.js](tests/sync_test.js)
+To have better understanding check these [test/sync_test.js](test/sync_test.js)
 ## Contribution
  Contribution is greatly appreciated! Please, run tests before submitting a pull request.  
