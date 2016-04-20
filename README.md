@@ -62,7 +62,7 @@ transaction loop happens when first value is changed.
 
 Worth mentioning: Transactions happen on demand, without "perpetual" loop or/and any other dirty checkers.
 
-## Watching many object
+## Watching many objects
 
 watchAll is not implemented yet, however subscriptions are introduced. Each watcher returns a "transaction" / watcher.
 If you want to track the changes, watchers' callback should return an object;
@@ -97,7 +97,7 @@ Outputs:
 {aValue : 1, bValue: 2 }
 ```
 
-Unfortunately, subscriptions will not remove themselves, you need to do it manually.
+Unfortunately, subscriptions won't clean up themselves, you need to do it manually.
 
 ```js
 subscription.unsubscribe();
