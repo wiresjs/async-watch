@@ -64,8 +64,8 @@ Worth mentioning: Transactions happen on demand, without "perpetual" loop or/and
 
 ## Watching many object
 
-watchAll is not implemented yet, however subscriptions are introduced. Each watcher returns a "transaction" / watcher;
-
+watchAll is not implemented yet, however subscriptions are introduced. Each watcher returns a "transaction" / watcher.
+If you want to track the changes, watchers' callback should return an object;
  ```js
 var obj = {
    a : 1,
@@ -83,7 +83,7 @@ var watcher2 = AsyncWatch(obj, 'b', function(value) {
 });
  ```
 
-If you want to track the changes, watchers' callback should return an object;
+
 
 ```js
 var subscription = AsyncWatch.subscribe([watcher1, watcher2], function(changes){
@@ -103,6 +103,6 @@ Unfortunately, subscriptions will not remove themselves, you need to do it manua
 subscription.unsubscribe();
 ```
 
-To have better understanding check these [tests/sync_test.js](tests)
+To have better understanding check these [tests/sync_test.js](tests/sync_test.js)
 ## Contribution
  Contribution is greatly appreciated! Please, run tests before submitting a pull request.  
