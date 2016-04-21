@@ -63,7 +63,6 @@ describe('Generic tests', function() {
       var obj = {};
       var results = [];
       var cb = function(value) {
-         console.log("VALUE", value)
          results.push(value);
       };
       watch(obj, 'a.b.c', cb);
