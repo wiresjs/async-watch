@@ -101,4 +101,36 @@ describe('Sync test', function() {
       }, 10)
    });
 
+   it("Should unsubscribe and destroy defined watchers", function(done) {
+      var results = [];
+      var obj = {
+         a: 1
+      }
+      var watcherResults = [];
+      var watcher = watch(obj, 'a', function(value) {
+         watcherResults.push(value);
+      });
+      var subscription = watch.subscribe([watcher], function(changes) {
+         results.push(changes);
+      });
+
+      setTimeout(function() {
+         obj.a = 2;
+      }, 1);
+      setTimeout(function() {
+         subscription.destroy();
+         obj.a = 3;
+      }, 2);
+
+      setTimeout(function() {
+         results.should.deepEqual([{
+            a: 1
+         }, {
+            a: 2
+         }]);
+         watcherResults.should.deepEqual([1, 2]);
+         done();
+      }, 10)
+   });
+
 })
