@@ -65,6 +65,15 @@ transaction loop happens when first value is changed.
 
 Worth mentioning: Transactions happen on demand, without "perpetual" loop or/and any other dirty checkers.
 
+## Destroying a watcher
+
+Destroys a watcher (does not destroy its descendants or similar watchers)
+ ```js
+var watcher = AsyncWatch(obj, 'a', function(value) {
+});
+watcher.destroy();
+ ```
+
 ## Watching many objects
 
 watchAll is not implemented yet, however subscriptions are introduced. Each watcher returns a "transaction" / watcher.
@@ -97,6 +106,13 @@ Unfortunately, subscriptions won't clean up themselves, you need to do it manual
 ```js
 subscription.unsubscribe();
 ```
+
+If you want to unsubscribe and destroy corresponding watchers:
+
+```js
+subscription.destroy();
+```
+
 
 To have better understanding check these [test/sync_test.js](test/sync_test.js)
 ## Contribution

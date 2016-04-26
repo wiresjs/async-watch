@@ -62,14 +62,14 @@
       subscribe: function(list, cb) {
          this.signFunction(cb);
          for (var i = 0; i < list.length; i++) {
-            var fn = list[i];
-            this.subscriptions[fn.$id] = cb;
+            var watcher = list[i];
+            this.subscriptions[watcher.fn.$id] = cb;
          }
       },
       unsubscribe: function(list) {
          for (var i = 0; i < list.length; i++) {
-            var fn = list[i];
-            delete this.subscriptions[fn.$id];
+            var watcher = list[i];
+            delete this.subscriptions[watcher.fn.$id];
          }
       },
       sign: function(signed, target) {
@@ -90,24 +90,20 @@
          return this.__digest();
       }
    }
-   var Subscribe = function(threads, fn) {
-      var threadCallbacks = [];
-      for (var i in threads) {
-         if (arguments.hasOwnProperty(i)) {
-            var thread = threads[i];
-            threadCallbacks.push(thread.fn);
-         }
-      }
-      AsyncTransaction.subscribe(threadCallbacks, fn);
+   var Subscribe = function(watchers, fn) {
+      AsyncTransaction.subscribe(watchers, fn);
       return {
          unsubscribe: function() {
-            return AsyncTransaction.unsubscribe(threadCallbacks);
+            return AsyncTransaction.unsubscribe(watchers);
+         },
+         destroy: function() {
+            AsyncTransaction.unsubscribe(watchers);
+            for (var i in watchers) {
+               var watcher = watchers[i];
+               watcher.destroy();
+            }
          }
       }
-   }
-
-   var Watcher = function(fn) {
-      this.fn = fn;
    }
 
    /**
@@ -199,8 +195,6 @@
       }
       callback.$id ? callback.$id : fnIdCounter++;
 
-      var $watcher = new Watcher(callback);
-
       if (instant) {
          callback.$instant = true;
       }
@@ -216,6 +210,7 @@
       for (var i = 0; i < original.length; i++) {
          keys.push(original[i])
       }
+
       // Descendants
       var descendantsArray = keys.splice(1, keys.length);
       var descendantsPath = descendantsArray.join('.');
@@ -304,8 +299,9 @@
          AsyncTransaction.sign(callback, function() {
             return [self[root]];
          });
-
+         //CallbackArrayCollection()
          $prop.$self.push(callback);
+
       } else {
          // We need to watch descendants
          if (!$prop.$descendants[descendantsPath]) {
@@ -330,15 +326,33 @@
 
             $prop.$descendants[descendantsPath].bindWatcher();
          } else {
-
             $prop.$descendants[descendantsPath].callbacks.push(callback);
          }
+
          AsyncTransaction.sign(callback, function() {
             return [getPropertyValue(self[root], descendantsArray)];
          });
       }
-      return $watcher;
+      var dArray = $prop.$descendants[descendantsPath];
+      return {
+         fn: callback,
+         destroy: function() {
+            if (dArray) {
+               var dIndex = dArray.callbacks.indexOf(callback);
+               if (dIndex > -1) {
+                  dArray.callbacks.splice(dIndex, 1);
+               }
+            }
+            if ($prop.$self) {
+               var sIndex = $prop.$self.indexOf(callback);
+               if (sIndex > -1) {
+                  $prop.$self.splice(dIndex, 1);
+               }
+            }
+         }
+      }
    }
+
    AsyncWatch.subscribe = Subscribe;
    Exports.AsyncWatch = AsyncWatch;
 
