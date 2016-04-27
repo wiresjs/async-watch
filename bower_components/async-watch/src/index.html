@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head >
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+
+<title>AsyncWatch</title>
+<script src="/async-watch.js"></script>
+
+<body >
+<script>
+var obj = {
+   a : 1,
+   b : 2,
+   c : {
+      d : {
+         e : 200
+      }
+   }
+}
+var watcher1 = AsyncWatch(obj, 'c.d.e', function(value) {
+   console.log('watcher1',value)
+});
+// var watcher2 = AsyncWatch(obj, 'c.d.e', function(value) {
+//    console.log('watcher2', value)
+// });
+
+
+setTimeout(function(){
+   watcher1.destroy();
+},100);
+
+setTimeout(function(){
+
+   obj.c.d.e = 5;
+   obj.c.d.e = 10;
+   console.log(obj)
+   var watcher5 = AsyncWatch(obj, 'c.d.e', function(value) {
+      console.log('watcher5',value)
+   });
+
+   setTimeout(function(){
+      obj.c.d.e = -6;
+   },100)
+},200)
+
+// var subscription = AsyncWatch.subscribe([watcher1, watcher2], function(changes){
+//    console.log(changes)
+// })
+// obj.c = {
+//    d : 5
+// }
+</script>
+</body>
+</html>

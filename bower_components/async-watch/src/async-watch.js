@@ -30,7 +30,6 @@
          if (self.scheduled === false) {
             self.scheduled = true;
             nextTick(function() {
-               self.scheduled = false;
                for (var i in self.jobs) {
                   self.jobs[i]();
                   delete self.jobs[i];
@@ -53,6 +52,7 @@
                   delete self._signed[i];
                }
                self.__subscribers(subCalls);
+               self.scheduled = false;
             });
          }
       },
@@ -193,7 +193,7 @@
       if (!notation) {
          return;
       }
-      callback.$id = callback.$id || fnIdCounter++;
+      callback.$id ? callback.$id : fnIdCounter++;
 
       if (instant) {
          callback.$instant = true;
