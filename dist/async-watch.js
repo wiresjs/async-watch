@@ -84,6 +84,9 @@
          }
          return this.__digest();
       },
+      cancel: function(signed) {
+         delete this._signed[signed.$id];
+      },
       add: function(job_id, cb, $scope) {
          cb = $scope ? cb.bind($scope) : cb;
          this.jobs[job_id] = cb;
@@ -167,7 +170,7 @@
          enumerable: false,
          value: value
       });
-      return obj;
+      return value;
    }
 
    var idCounter = 0;
@@ -353,8 +356,80 @@
       }
    }
 
+   var AsyncWatchArray = function(self, userPath, callback, instant) {
+      var events = [];
+      return AsyncWatch(self, userPath, function(array, oldvalue) {
+         if (!array.$$p) {
+            array.$$p = p = setHiddenProperty(array, '$pp', {});
+         }
+         var $config = array.$$p.array;
+         if (!$config) {
+            $config = setHiddenProperty(p, 'array', {});
+         }
+         if (!$config.watchers) {
+            $config.watchers = setHiddenProperty($config, 'fn', []);
+         }
+         $config.watchers.push(callback);
+
+         // Initialize array (prototyping push splice)
+         if (!$config.init) {
+            $config.init = true;
+
+            $config.changed = function(evt) {
+               if (evt.length > 0) {
+                  for (var i = 0; i < $config.watchers.length; i++) {
+                     $config.watchers[i](array, events);
+                  }
+               }
+               events = [];
+            }
+
+            array.push = function() {
+               Array.prototype.push.apply(this, arguments);
+               var args = arguments;
+               events.push({
+                  name: "push",
+                  data: args
+               });
+               AsyncTransaction.sign($config.changed, function() {
+                  return [events];
+               });
+            }
+            array.splice = function() {
+               var args = arguments;
+               Array.prototype.splice.apply(this, arguments);
+               events.push({
+                  name: "splice",
+                  data: args
+               });
+               AsyncTransaction.sign($config.changed, function() {
+                  return [events];
+               });
+            }
+            array.unshift = function() {
+               var args = arguments;
+               Array.prototype.unshift.apply(this, args);
+               events.push({
+                  name: "unshift",
+                  data: args
+               });
+               AsyncTransaction.sign($config.changed, function() {
+                  return [events];
+               });
+            }
+         }
+         // reset events
+         events = [];
+         // initial run
+         return callback(array, [{
+            name: 'init'
+         }]);
+      });
+   }
+
    AsyncWatch.subscribe = Subscribe;
    Exports.AsyncWatch = AsyncWatch;
+   Exports.AsyncWatchArray = AsyncWatchArray;
 
    Exports.AsyncTransaction = AsyncTransaction;
 })(typeof module !== 'undefined' && module.exports, this);

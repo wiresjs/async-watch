@@ -14,39 +14,51 @@
 <body >
 <script>
 var obj = {
-   a : 1,
-   b : 2,
-   c : {
-      d : {
-         e : 200
+   users : [{name : "John"}, {name : "Bob"}]
+}
+window.obj = obj;
+AsyncWatchArray(obj, 'users', function(array,events){
+   console.warn("1>>")
+   for(var i in events){
+      var e = events[i]
+      if(e.name === "init"){
+         console.log("CREATE ARRAY",array);
+      } else {
+         console.log(e.name, e.data)
       }
    }
-}
-var watcher1 = AsyncWatch(obj, 'c.d.e', function(value) {
-   console.log('watcher1',value)
+   console.log('1 < *******')
 });
-// var watcher2 = AsyncWatch(obj, 'c.d.e', function(value) {
-//    console.log('watcher2', value)
+// AsyncWatchArray(obj, 'users', function(array,events){
+//    console.warn("2>>")
+//    for(var i in events){
+//       var e = events[i]
+//       if(e.name === "init"){
+//          console.log("CREATE ARRAY",array);
+//       } else {
+//          console.log(e.name, e.data)
+//       }
+//    }
+//    console.log('2 < *******')
 // });
-
-
+obj.users.push({name : 0})
+obj.users.push({name : 1})
+//
 setTimeout(function(){
-   watcher1.destroy();
-},100);
+   obj.users.push({name : 2})
+   obj.users.push({name : 3})
+   obj.users = [{name : 3}]
 
-setTimeout(function(){
+},0)
+//
+//
+// setTimeout(function(){
+//    obj.users.push({name : 4})
+//
+// },1)
 
-   obj.c.d.e = 5;
-   obj.c.d.e = 10;
-   console.log(obj)
-   var watcher5 = AsyncWatch(obj, 'c.d.e', function(value) {
-      console.log('watcher5',value)
-   });
 
-   setTimeout(function(){
-      obj.c.d.e = -6;
-   },100)
-},200)
+
 
 // var subscription = AsyncWatch.subscribe([watcher1, watcher2], function(changes){
 //    console.log(changes)

@@ -113,6 +113,20 @@ If you want to unsubscribe and destroy corresponding watchers:
 subscription.destroy();
 ```
 
+## Watching arrays
+```js
+var obj = {
+   users : [{name : "John"}, {name : "Bob"}]
+}
+
+
+AsyncWatchArray(obj, 'users', function(array,events){
+   console.log(events);
+});
+
+Triggers events: "init" "push" "splice"
+```
+
 
 To have better understanding check these [test/sync_test.js](test/sync_test.js)
 ## Contribution
