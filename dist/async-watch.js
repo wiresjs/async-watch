@@ -284,9 +284,17 @@
                }
             }
             if ($isSingleProperty) {
+
                // Trigger $self watchers
                for (var i = 0; i < $prop.$self.length; i++) {
                   var _cb = $prop.$self[i];
+                  if( _cb.$path ){ // handle old value propertly
+
+                     if( typeof oldValue === "object" ){
+                        oldValue = getPropertyValue(oldValue, _cb.$path )
+                     }
+
+                  }
                   AsyncTransaction.sign(_cb, function() {
                      return [value, oldValue];
                   })
@@ -318,6 +326,7 @@
                      AsyncWatch(self[root], descendantsArray, function(value, oldValue) {
                         for (var i = 0; i < $prop.$descendants[descendantsPath].callbacks.length; i++) {
                            var _cb = $prop.$descendants[descendantsPath].callbacks[i];
+
                            AsyncTransaction.sign(_cb, function() {
                               return [value, oldValue];
                            });
