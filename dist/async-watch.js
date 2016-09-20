@@ -261,7 +261,6 @@
          // if we have an explicit callback to fire ($self)
          // Notify descendants
          var onRootPropertySet = function(value, oldValue) {
-
             // Trigger Descendants
             for (var descendantKey in $prop.$descendants) {
                if ($prop.$descendants.hasOwnProperty(descendantKey)) {
@@ -284,16 +283,13 @@
                }
             }
             if ($isSingleProperty) {
-
                // Trigger $self watchers
                for (var i = 0; i < $prop.$self.length; i++) {
                   var _cb = $prop.$self[i];
-                  if( _cb.$path ){ // handle old value propertly
-
-                     if( typeof oldValue === "object" ){
-                        oldValue = getPropertyValue(oldValue, _cb.$path )
+                  if (_cb.$path) { // handle old value propertly
+                     if (typeof oldValue === "object") {
+                        oldValue = getPropertyValue(oldValue, _cb.$path)
                      }
-
                   }
                   AsyncTransaction.sign(_cb, function() {
                      return [value, oldValue];
@@ -438,6 +434,7 @@
 
    AsyncWatch.subscribe = Subscribe;
    Exports.AsyncWatch = AsyncWatch;
+   Exports.AsyncSubscribe = Subscribe;
    Exports.AsyncWatchArray = AsyncWatchArray;
 
    Exports.AsyncTransaction = AsyncTransaction;

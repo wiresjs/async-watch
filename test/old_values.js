@@ -1,3 +1,4 @@
+"use strict";
 var should = require('should');
 var watch = require(__dirname + "/../src/async-watch.js").AsyncWatch;
 

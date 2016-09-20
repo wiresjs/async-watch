@@ -434,6 +434,7 @@
 
    AsyncWatch.subscribe = Subscribe;
    Exports.AsyncWatch = AsyncWatch;
+   Exports.AsyncSubscribe = Subscribe;
    Exports.AsyncWatchArray = AsyncWatchArray;
 
    Exports.AsyncTransaction = AsyncTransaction;
