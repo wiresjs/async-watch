@@ -44,10 +44,10 @@
                   var task = self._signed[i];
                   var arrayValue = task.target();
                   task.signed.apply(null, arrayValue);
-
                   // Check for subscriptions
                   if (self.subscriptions[i]) {
                      var localId = self.subscriptions[i].$id;
+                     //console.log(">>", localId, arrayValue)
                      subCalls[localId] = subCalls[localId] || {
                         values: {},
                         fn: self.subscriptions[i]
@@ -56,6 +56,7 @@
                   }
                   delete self._signed[i];
                }
+
                self.__subscribers(subCalls);
             });
          }
@@ -432,7 +433,7 @@
                });
             }
             array.splice = function() {
-               
+
                var args = arguments;
                Array.prototype.splice.apply(this, arguments);
                events.push({

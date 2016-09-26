@@ -2,11 +2,11 @@ var should = require('should');
 var watch = require(__dirname + "/../src/async-watch.js").AsyncWatch;
 
 describe('Corner case', function(done) {
-   it('Should trigger the latest set property (1 watcher)', function() {
+   it('Should trigger the latest set property (1 watcher)', function(done) {
       var obj = {};
       var results = [];
       watch(obj, 'a.b.c', function(value) {
-         
+
          results.push(value);
       });
       obj.a = {

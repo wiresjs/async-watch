@@ -3,7 +3,7 @@ var AsyncWatchArray = require(__dirname + "/../src/async-watch.js").AsyncWatchAr
 
 describe('Arrays', function(done) {
    it('Should handle instant watch', function(done) {
-      let boo = {
+      var boo = {
          a: `a`,
          list: [1, 2, 3]
       }
