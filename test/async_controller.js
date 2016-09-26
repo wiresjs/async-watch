@@ -2,7 +2,7 @@ var should = require('should');
 var AsyncModel = require(__dirname + "/../src/async-watch.js").AsyncModel
 
 describe('AsyncController test', function(done) {
-   it("should", function() {
+   it("should trigger changes", function() {
       class MyObj extends AsyncModel {
          initialize()
          {
