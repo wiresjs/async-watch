@@ -6,6 +6,7 @@ describe('Corner case', function(done) {
       var obj = {};
       var results = [];
       watch(obj, 'a.b.c', function(value) {
+         
          results.push(value);
       });
       obj.a = {

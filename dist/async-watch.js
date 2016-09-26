@@ -365,6 +365,10 @@
         }
     }
 
+   var AsyncController  = function(){
+
+   }
+
     var AsyncWatchArray = function(self, userPath, callback, instant) {
         var events = [];
         return AsyncWatch(self, userPath, function(array, oldvalue) {
@@ -437,14 +441,16 @@
     }
 
     AsyncWatch.subscribe = Subscribe;
-    Exports.AsyncWatch = AsyncWatch;
+    Exports.AsyncWatch = AsyncWatch
     Exports.AsyncSubscribe = Subscribe;
     Exports.AsyncWatchArray = AsyncWatchArray;
+    Exports.AsyncController = AsyncController;
     Exports.AsyncTransaction = AsyncTransaction;
     if( npmExpose ){
       npmExpose.AsyncWatch = AsyncWatch;
       npmExpose.AsyncSubscribe = AsyncSubscribe;
       npmExpose.AsyncWatchArray = AsyncWatchArray;
       npmExpose.AsyncTransaction = AsyncTransaction;
+      npmExpose.AsyncController = AsyncController;
    }
 })(typeof module !== 'undefined' && module.exports, this);
