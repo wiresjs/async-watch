@@ -12,8 +12,8 @@ gulp.task('copyFiles', function() {
 gulp.task('uglify', function() {
    return gulp.src(['dist/async-watch.js'])
 
-      .pipe(babel({presets : ["es2015"]}))
-      .pipe(replace(/&& module.exports, undefined\);/, "&& module.exports, this);"))
+      //.pipe(babel({presets : ["es2015"]}))
+      //.pipe(replace(/&& module.exports, undefined\);/, "&& module.exports, this);"))
       .pipe(rename("dist/async-watch.min.js"))
       .pipe(uglify())
       .pipe(gulp.dest("./"));

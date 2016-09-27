@@ -44,10 +44,10 @@
                   var task = self._signed[i];
                   var arrayValue = task.target();
                   task.signed.apply(null, arrayValue);
-
                   // Check for subscriptions
                   if (self.subscriptions[i]) {
                      var localId = self.subscriptions[i].$id;
+                     //console.log(">>", localId, arrayValue)
                      subCalls[localId] = subCalls[localId] || {
                         values: {},
                         fn: self.subscriptions[i]
@@ -56,6 +56,7 @@
                   }
                   delete self._signed[i];
                }
+
                self.__subscribers(subCalls);
             });
          }
@@ -192,205 +193,205 @@
     */
    var AsyncWatch = function(self, userPath, callback, instant) {
 
-      if (typeof self !== 'object' || typeof callback !== 'function') {
-         return;
-      }
-
-      var notation = dotNotation(userPath);
-      if (!notation) {
-         return;
-      }
-      callback.$id = callback.$id || fnIdCounter++;
-
-      if (instant) {
-         callback.$instant = true;
-      }
-
-      var original = notation.path;
-      var originStringUserPath = notation.str;;
-      callback.$path = originStringUserPath;
-      // root (a.b.c.d -> gives a)
-      var root = original[0];
-
-      // Copy of original array
-      var keys = [];
-      for (var i = 0; i < original.length; i++) {
-         keys.push(original[i])
-      }
-
-      // Descendants
-      var descendantsArray = keys.splice(1, keys.length);
-      var descendantsPath = descendantsArray.join('.');
-      var $isSingleProperty = root === originStringUserPath
-      var $config = self.$$p;
-      var $id;
-
-      if (!$config) {
-         // Creating configration
-         setHiddenProperty(self, '$$p', {});
-         // Creating a service callback
-         $config = self.$$p;
-         setHiddenProperty($config, '$properties', {});
-         setHiddenProperty($config, '$id', ++idCounter);
-      }
-      if ($id === undefined) {
-         $id = $config.$id;
-      }
-
-      var $prop = $config.$properties[root];
-
-      if (!$prop) {
-
-         // $prop = setHiddenProperty($config.$properties, root, {});
-         // $prop.$self = [];
-         // $prop.$descendants = {};
-         $prop = $config.$properties[root] = {
-            $self: [],
-            $descendants: {}
-         }
-         var current = self[root];
-         Object.defineProperty(self, root, {
-            get: function() {
-               return current;
-            },
-            set: function(newValue) {
-               onRootPropertySet(newValue, current);
-               current = newValue;
-               return current;
-            }
-         });
-
-         // Triggers when a root has changed
-         // Here we need to verify
-         // if we have an explicit callback to fire ($self)
-         // Notify descendants
-         var onRootPropertySet = function(value, oldValue) {
-            // Trigger Descendants
-            for (var descendantKey in $prop.$descendants) {
-               if ($prop.$descendants.hasOwnProperty(descendantKey)) {
-
-                  for (var i in $prop.$descendants[descendantKey].callbacks) {
-                     // Job id has to have a callback index attached
-                     var job_id = $id + descendantKey + i;
-                     var descendantCallback = $prop.$descendants[descendantKey].callbacks[i];
-
-                     AsyncTransaction.sign(descendantCallback, function() {
-                        return [getPropertyValue(value, descendantKey), oldValue];
-                     });
-                  }
-
-                  AsyncTransaction.add($id + descendantKey, function() {
-                     $prop.$descendants[this.key].bindWatcher();
-                  }, {
-                     key: descendantKey
-                  });
-               }
-            }
-            if ($isSingleProperty) {
-               // Trigger $self watchers
-               for (var i = 0; i < $prop.$self.length; i++) {
-                  var _cb = $prop.$self[i];
-                  if (_cb.$path) { // handle old value propertly
-                     if (typeof oldValue === "object") {
-                        oldValue = getPropertyValue(oldValue, _cb.$path)
-                     }
-                  }
-                  AsyncTransaction.sign(_cb, function() {
-                     return [value, oldValue];
-                  })
-               }
-            }
-         }
-      }
-
-      // If we are watching explicitly for the root variable
-      if ($isSingleProperty) {
-
-         // Job id has to have a callback index attached
-         AsyncTransaction.sign(callback, function() {
-            return [self[root]];
-         });
-         //CallbackArrayCollection()
-         $prop.$self.push(callback);
-
-      } else {
-         // We need to watch descendants
-         if (!$prop.$descendants[descendantsPath]) {
-            $prop.$descendants[descendantsPath] = {
-               callbacks: [callback],
-               bindWatcher: function() {
-
-                  if (self.hasOwnProperty(root) && self[root] !== undefined) {
-                     // we want NEW data only here.
-                     // Initial callback has been triggered
-                     AsyncWatch(self[root], descendantsArray, function(value, oldValue) {
-                        for (var i = 0; i < $prop.$descendants[descendantsPath].callbacks.length; i++) {
-                           var _cb = $prop.$descendants[descendantsPath].callbacks[i];
-
-                           AsyncTransaction.sign(_cb, function() {
-                              return [value, oldValue];
-                           });
-                        }
-                     }, true); // We don't want to call another callback here
-                  }
-               }
-            }
-
-            $prop.$descendants[descendantsPath].bindWatcher();
-         } else {
-            $prop.$descendants[descendantsPath].callbacks.push(callback);
+         if (typeof self !== 'object' || typeof callback !== 'function') {
+            return;
          }
 
-         AsyncTransaction.sign(callback, function() {
-            return [getPropertyValue(self[root], descendantsArray)];
-         });
-      }
-      var dArray = $prop.$descendants[descendantsPath];
-      return {
-         fn: callback,
-         destroy: function() {
-            if (dArray) {
-               var dIndex = dArray.callbacks.indexOf(callback);
-               if (dIndex > -1) {
-                  dArray.callbacks.splice(dIndex, 1);
-               }
-            }
-            if ($prop.$self) {
-               var sIndex = $prop.$self.indexOf(callback);
-               if (sIndex > -1) {
-                  $prop.$self.splice(dIndex, 1);
-               }
-            }
+         var notation = dotNotation(userPath);
+         if (!notation) {
+            return;
          }
-      }
-   }
-   class AsyncModel {
-      constructor() {
-         this.initialize ? this.initialize() : '';
-         var watchers = [];
-         var self = this;
-         for (var property in this) {
-            if (this.hasOwnProperty(property)) {
-               var watcher = AsyncWatch(this, property, function(){
-                  var propertyListener = "on" + this.propertyName.charAt(0).toUpperCase() + this.propertyName.slice(1);
-               }.bind({propertyName : property}));
-               watchers.push(watcher);
-            }
-            this.$subscription = Subscribe(watchers, function(changes){
+         callback.$id = callback.$id || fnIdCounter++;
 
-               if( typeof self["onChanges"] === "function" ){
-                  self["onChanges"](changes);
-               }
-               if( typeof self.__listener === "function"){
-                  self.__listener(changes);
+         if (instant) {
+            callback.$instant = true;
+         }
+
+         var original = notation.path;
+         var originStringUserPath = notation.str;;
+         callback.$path = originStringUserPath;
+         // root (a.b.c.d -> gives a)
+         var root = original[0];
+
+         // Copy of original array
+         var keys = [];
+         for (var i = 0; i < original.length; i++) {
+            keys.push(original[i])
+         }
+
+         // Descendants
+         var descendantsArray = keys.splice(1, keys.length);
+         var descendantsPath = descendantsArray.join('.');
+         var $isSingleProperty = root === originStringUserPath
+         var $config = self.$$p;
+         var $id;
+
+         if (!$config) {
+            // Creating configration
+            setHiddenProperty(self, '$$p', {});
+            // Creating a service callback
+            $config = self.$$p;
+            setHiddenProperty($config, '$properties', {});
+            setHiddenProperty($config, '$id', ++idCounter);
+         }
+         if ($id === undefined) {
+            $id = $config.$id;
+         }
+
+         var $prop = $config.$properties[root];
+
+         if (!$prop) {
+
+            // $prop = setHiddenProperty($config.$properties, root, {});
+            // $prop.$self = [];
+            // $prop.$descendants = {};
+            $prop = $config.$properties[root] = {
+               $self: [],
+               $descendants: {}
+            }
+            var current = self[root];
+            Object.defineProperty(self, root, {
+               get: function() {
+                  return current;
+               },
+               set: function(newValue) {
+                  onRootPropertySet(newValue, current);
+                  current = newValue;
+                  return current;
                }
             });
+
+            // Triggers when a root has changed
+            // Here we need to verify
+            // if we have an explicit callback to fire ($self)
+            // Notify descendants
+            var onRootPropertySet = function(value, oldValue) {
+               // Trigger Descendants
+               for (var descendantKey in $prop.$descendants) {
+                  if ($prop.$descendants.hasOwnProperty(descendantKey)) {
+
+                     for (var i in $prop.$descendants[descendantKey].callbacks) {
+                        // Job id has to have a callback index attached
+                        var job_id = $id + descendantKey + i;
+                        var descendantCallback = $prop.$descendants[descendantKey].callbacks[i];
+
+                        AsyncTransaction.sign(descendantCallback, function() {
+                           return [getPropertyValue(value, descendantKey), oldValue];
+                        });
+                     }
+
+                     AsyncTransaction.add($id + descendantKey, function() {
+                        $prop.$descendants[this.key].bindWatcher();
+                     }, {
+                        key: descendantKey
+                     });
+                  }
+               }
+               if ($isSingleProperty) {
+                  // Trigger $self watchers
+                  for (var i = 0; i < $prop.$self.length; i++) {
+                     var _cb = $prop.$self[i];
+                     if (_cb.$path) { // handle old value propertly
+                        if (typeof oldValue === "object") {
+                           oldValue = getPropertyValue(oldValue, _cb.$path)
+                        }
+                     }
+                     AsyncTransaction.sign(_cb, function() {
+                        return [value, oldValue];
+                     })
+                  }
+               }
+            }
+         }
+
+         // If we are watching explicitly for the root variable
+         if ($isSingleProperty) {
+
+            // Job id has to have a callback index attached
+            AsyncTransaction.sign(callback, function() {
+               return [self[root]];
+            });
+            //CallbackArrayCollection()
+            $prop.$self.push(callback);
+
+         } else {
+            // We need to watch descendants
+            if (!$prop.$descendants[descendantsPath]) {
+               $prop.$descendants[descendantsPath] = {
+                  callbacks: [callback],
+                  bindWatcher: function() {
+
+                     if (self.hasOwnProperty(root) && self[root] !== undefined) {
+                        // we want NEW data only here.
+                        // Initial callback has been triggered
+                        AsyncWatch(self[root], descendantsArray, function(value, oldValue) {
+                           for (var i = 0; i < $prop.$descendants[descendantsPath].callbacks.length; i++) {
+                              var _cb = $prop.$descendants[descendantsPath].callbacks[i];
+
+                              AsyncTransaction.sign(_cb, function() {
+                                 return [value, oldValue];
+                              });
+                           }
+                        }, true); // We don't want to call another callback here
+                     }
+                  }
+               }
+
+               $prop.$descendants[descendantsPath].bindWatcher();
+            } else {
+               $prop.$descendants[descendantsPath].callbacks.push(callback);
+            }
+
+            AsyncTransaction.sign(callback, function() {
+               return [getPropertyValue(self[root], descendantsArray)];
+            });
+         }
+         var dArray = $prop.$descendants[descendantsPath];
+         return {
+            fn: callback,
+            destroy: function() {
+               if (dArray) {
+                  var dIndex = dArray.callbacks.indexOf(callback);
+                  if (dIndex > -1) {
+                     dArray.callbacks.splice(dIndex, 1);
+                  }
+               }
+               if ($prop.$self) {
+                  var sIndex = $prop.$self.indexOf(callback);
+                  if (sIndex > -1) {
+                     $prop.$self.splice(dIndex, 1);
+                  }
+               }
+            }
          }
       }
-      listen(listener){
-         this.__listener = listener;
-      }
-   }
+      // class AsyncModel {
+      //    constructor() {
+      //       this.initialize ? this.initialize() : '';
+      //       var watchers = [];
+      //       var self = this;
+      //       for (var property in this) {
+      //          if (this.hasOwnProperty(property)) {
+      //             var watcher = AsyncWatch(this, property, function(){
+      //                var propertyListener = "on" + this.propertyName.charAt(0).toUpperCase() + this.propertyName.slice(1);
+      //             }.bind({propertyName : property}));
+      //             watchers.push(watcher);
+      //          }
+      //          this.$subscription = Subscribe(watchers, function(changes){
+      //
+      //             if( typeof self["onChanges"] === "function" ){
+      //                self["onChanges"](changes);
+      //             }
+      //             if( typeof self.__listener === "function"){
+      //                self.__listener(changes);
+      //             }
+      //          });
+      //       }
+      //    }
+      //    listen(listener){
+      //       this.__listener = listener;
+      //    }
+      // }
 
    var AsyncWatchArray = function(self, userPath, callback, instant) {
       var events = [];
@@ -432,7 +433,7 @@
                });
             }
             array.splice = function() {
-               
+
                var args = arguments;
                Array.prototype.splice.apply(this, arguments);
                events.push({
@@ -469,13 +470,11 @@
    Exports.AsyncWatch = AsyncWatch;
    Exports.AsyncSubscribe = Subscribe;
    Exports.AsyncWatchArray = AsyncWatchArray;
-   Exports.AsyncModel = AsyncModel;
    Exports.AsyncTransaction = AsyncTransaction;
    if (npmExpose) {
       npmExpose.AsyncWatch = AsyncWatch;
       npmExpose.AsyncSubscribe = AsyncSubscribe;
       npmExpose.AsyncWatchArray = AsyncWatchArray;
       npmExpose.AsyncTransaction = AsyncTransaction;
-      npmExpose.AsyncModel = AsyncModel;
    }
 })(typeof module !== 'undefined' && module.exports, this);
