@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/wiresjs/async-watch.svg?branch=master)](https://travis-ci.org/wiresjs/async-watch)
 
-[[IHateReact](https://badges.gitter.im/owner/repo.png)
+[![IHateReact](https://gitter.im/I-Hate-React/Lobby)](https://gitter.im/I-Hate-React/Lobby)
 
 AsyncWatch is a small library for watching javascript/node.js objects. It uses Object.defineProperty which makes it compatible with most browsers. Any changes happening within present tick will be called on the next available one.
 
