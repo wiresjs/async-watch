@@ -5,7 +5,7 @@
 
 AsyncWatch is a small library for watching javascript/node.js objects. It uses Object.defineProperty which makes it compatible with most browsers. Any changes happening within present tick will be called on the next available one.
 
-![Diagramm](diagramm.png)
+![Diagramm](diagramm.png) 
 
 ## Features
 
