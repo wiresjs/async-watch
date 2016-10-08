@@ -9,11 +9,20 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
 
 ## Features
 
- * Asynchronous execution (Changes are triggerd on requestAnimationFrame)
- * Nested object watching
+ * Asynchronous execution (Changes are triggered on r`equestAnimationFrame` in browser and on `process.nextTick` in Node)
+ * Being Asynchronous means we don’t have to worry about the execution flow, details below
+ * Works in Node and Browser
+ * No Dirty Checking or `Object.observe`
+ * Using `Object.defineProperty()` makes it compatible with all modern browser down to IE 9
+ * Order of watchers is preserved
+ * Deep watch properties
+ * Ability to inspect change type for Arrays (`init`,`splice`, `push`)
+ * Computed Properties
+ * Get old and new values in the change callback
+ * Can watch any type of Object for example Watching `DOM` `Node` properties and attributes
  * Restoring watchers after objects are destroyed
- * No dirty hacks
- * Good test coverage
+ * Can be used as the back-bone to create a custom efficient tow binding system
+ * Comprehensive test coverage
 
 ## Install
 
