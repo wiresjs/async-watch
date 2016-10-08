@@ -365,33 +365,18 @@
             }
          }
       }
-      // class AsyncModel {
-      //    constructor() {
-      //       this.initialize ? this.initialize() : '';
-      //       var watchers = [];
-      //       var self = this;
-      //       for (var property in this) {
-      //          if (this.hasOwnProperty(property)) {
-      //             var watcher = AsyncWatch(this, property, function(){
-      //                var propertyListener = "on" + this.propertyName.charAt(0).toUpperCase() + this.propertyName.slice(1);
-      //             }.bind({propertyName : property}));
-      //             watchers.push(watcher);
-      //          }
-      //          this.$subscription = Subscribe(watchers, function(changes){
-      //
-      //             if( typeof self["onChanges"] === "function" ){
-      //                self["onChanges"](changes);
-      //             }
-      //             if( typeof self.__listener === "function"){
-      //                self.__listener(changes);
-      //             }
-      //          });
-      //       }
-      //    }
-      //    listen(listener){
-      //       this.__listener = listener;
-      //    }
-      // }
+
+   var AsyncComputed = function(obj, prop, deps, fn){
+      var watchers = [];
+      for(var i = 0; i< deps.length;i++){
+         var _local = deps[i];
+         watchers.push(AsyncWatch(obj, _local, function(){}));
+      }
+      return Subscribe(watchers, function(){
+         obj[prop] = fn.bind(obj)(obj);
+      });
+   }
+
 
    var AsyncWatchArray = function(self, userPath, callback, instant) {
       var events = [];
@@ -467,8 +452,10 @@
    }
 
    AsyncWatch.subscribe = Subscribe;
+   AsyncWatch.computed = AsyncComputed;
    Exports.AsyncWatch = AsyncWatch;
    Exports.AsyncSubscribe = Subscribe;
+   Exports.AsyncComputed = AsyncComputed;
    Exports.AsyncWatchArray = AsyncWatchArray;
    Exports.AsyncTransaction = AsyncTransaction;
    if (npmExpose) {

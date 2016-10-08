@@ -1,5 +1,6 @@
 var should = require('should');
 var AsyncWatchArray = require(__dirname + "/../src/async-watch.js").AsyncWatchArray;
+var AsyncWatch = require(__dirname + "/../src/async-watch.js").AsyncWatch;
 
 describe('Arrays', function(done) {
    it('Should handle instant watch', function(done) {
@@ -17,5 +18,4 @@ describe('Arrays', function(done) {
          done();
       }, 1)
    });
-
 });

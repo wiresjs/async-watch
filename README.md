@@ -113,6 +113,26 @@ If you want to unsubscribe and destroy corresponding watchers:
 subscription.destroy();
 ```
 
+
+## Computed properties
+You can define a computed property.
+
+```js
+var obj = {
+   firstName : "Bob",
+   lastName : "Marley"
+}
+
+AsyncComputed(obj, 'fullName', ['firstName', 'lastName'], (self) => {
+   return `Name is ${self.firstName} ${self.lastName}`
+});
+
+obj.lastName = "Foo";
+obj.lastName = "Foo1";
+AsyncWatch(obj, 'fullName', (value) => {
+   // Name is Bob Foo1
+});
+```
 ## Watching arrays
 ```js
 var obj = {
