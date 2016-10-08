@@ -9,7 +9,7 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
 
 ## Features
 
- * Asynchronous execution (Changes are triggered on r`equestAnimationFrame` in browser and on `process.nextTick` in Node)
+ * Asynchronous execution (Changes are triggered on `requestAnimationFrame` in browser and on `process.nextTick` in Node)
  * Being Asynchronous means we don’t have to worry about the execution flow, details below
  * Works in Node and Browser
  * No Dirty Checking or `Object.observe`
