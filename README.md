@@ -13,7 +13,6 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
  * Nested object watching
  * Restoring watchers after objects are destroyed
  * No dirty hacks
- * Suitable for angular-like frameworks
  * Good test coverage
 
 ## Install

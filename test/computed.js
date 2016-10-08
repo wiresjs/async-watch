@@ -10,10 +10,10 @@ describe('Computed test', function(done) {
          firstName : "Bob",
          lastName : "Marley"
       }
+      
       var results = [];
-      AsyncComputed(obj, 'fullName', ['firstName', 'lastName'], (self) => {
-         return `Name is ${self.firstName} ${self.lastName}`
-      });
+      AsyncComputed(obj, 'fullName', ['firstName', 'lastName'],
+         self => `Name is ${self.firstName} ${self.lastName}`);
 
       obj.lastName = "Foo";
       obj.lastName = "Foo1";
