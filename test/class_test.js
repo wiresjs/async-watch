@@ -44,7 +44,7 @@ describe('Class test', function() {
             }, 2)
 
             setTimeout(() => {
-               
+
                results.should.deepEqual([ undefined, 'Bob', 'Marley' ])
                done();
             },20)
@@ -52,4 +52,33 @@ describe('Class test', function() {
 
 
          });
+
+      it('Should hande ctor', function(done) {
+         class Todo {
+            constructor()
+            {
+               this.user = { name : "Test"}
+            }
+         }
+         let todo = new Todo();
+         var results = [];
+         AsyncWatch(todo, `user.name`, (newVal) => {
+            results.push(newVal);
+         })
+         setTimeout(() => {
+            todo.user = {}
+            todo.user.name = "Bob";
+         }, 1)
+         setTimeout(() => {
+            todo.user.name = "Foo";
+            todo.user = {};
+            todo.user.name = "Marley"
+         }, 2)
+
+         setTimeout(() => {
+            
+            results.should.deepEqual([ 'Test', 'Bob', 'Marley' ])
+            done();
+         },20)
+      });
 });
