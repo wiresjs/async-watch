@@ -21,7 +21,7 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
  * Get old and new values in the change callback
  * Can watch any type of Object for example Watching `DOM` `Node` properties and attributes
  * Restoring watchers after objects are destroyed
- * Can be used as the back-bone to create a custom efficient tow binding system
+ * Can be used as the back-bone to create a custom efficient two-way binding system
  * Comprehensive test coverage
 
 ## Install
