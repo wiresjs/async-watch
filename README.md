@@ -26,18 +26,12 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
 
 ## Install
 
-For browser:
-
-    bower install async-watch --save
-
-For Node.js projects
-
     npm install async-watch --save
 
 ## Examples
 
 ```js
-var AsyncWatch = require('async-watch').AsyncWatch; // not needed for browsers
+var AsyncWatch = require('async-watch').AsyncWatch;
 var obj = {}; // creating an empty object
 AsyncWatch(obj, 'a.b.c', function(value){
     console.log('set', value);
