@@ -1,6 +1,6 @@
 var isNode = typeof module !== "undefined" && module.exports && typeof process === "object" && typeof window === "undefined";
 // Make is compatable with node.js
-var nextTick = isNode ? process.nextTick : Exports.requestAnimationFrame;
+var nextTick = isNode ? process.nextTick : window.requestAnimationFrame;
 
 var fnIdCounter = 0;
 /**
