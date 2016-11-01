@@ -14,8 +14,9 @@ describe('Arrays', function(done) {
       }, true);
       boo.list.splice(0, 1);
       boo.list.shift();
+      boo.list.unshift(4);
       setTimeout(() => {
-         results.should.deepEqual(["init", "splice","shift"])
+         results.should.deepEqual(["init", "splice","shift","unshift"])
          done();
       }, 1)
    });
