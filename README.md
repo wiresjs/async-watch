@@ -16,7 +16,7 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
  * Using `Object.defineProperty()` makes it compatible with all modern browser down to IE 9
  * Order of watchers is preserved
  * Deep watch properties
- * Ability to inspect change type for Arrays (`init`,`splice`, `push`)
+ * Ability to inspect change type for Arrays (`init`,`unshift`,`shift`,`splice`, `push`)
  * Computed Properties
  * Get old and new values in the change callback
  * Can watch any type of Object for example Watching `DOM` `Node` properties and attributes
