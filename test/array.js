@@ -10,11 +10,12 @@ describe('Arrays', function(done) {
       }
       var results = [];
       AsyncWatchArray(boo, `list`, (newVal, events) => {
-         results.push(events[0].name);
+        events.forEach((event)=> results.push(event.name))
       }, true);
       boo.list.splice(0, 1);
+      boo.list.shift();
       setTimeout(() => {
-         results.should.deepEqual(["init", "splice"])
+         results.should.deepEqual(["init", "splice","shift"])
          done();
       }, 1)
    });
