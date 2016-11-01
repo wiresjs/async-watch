@@ -409,6 +409,19 @@ var AsyncWatchArray = function(self, userPath, callback, instant) {
                return [events];
             });
          }
+         array.shift = function() {
+
+            var args = arguments;
+            Array.prototype.shift.apply(this, arguments);
+            events.push({
+               name: "shift",
+               data: args
+            });
+
+            AsyncTransaction.sign($config.changed, function() {
+               return [events];
+            });
+         }
          array.splice = function() {
 
             var args = arguments;
