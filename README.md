@@ -9,7 +9,7 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
 
 ## Features
 
- * Asynchronous execution (Changes are triggered on r`equestAnimationFrame` in browser and on `process.nextTick` in Node)
+ * Asynchronous execution (Changes are triggered on `requestAnimationFrame` in browser and on `process.nextTick` in Node)
  * Being Asynchronous means we don’t have to worry about the execution flow, details below
  * Works in Node and Browser
  * No Dirty Checking or `Object.observe`
@@ -21,23 +21,17 @@ AsyncWatch is a small library for watching javascript/node.js objects. It uses O
  * Get old and new values in the change callback
  * Can watch any type of Object for example Watching `DOM` `Node` properties and attributes
  * Restoring watchers after objects are destroyed
- * Can be used as the back-bone to create a custom efficient tow binding system
+ * Can be used as the back-bone to create a custom efficient two-way binding system
  * Comprehensive test coverage
 
 ## Install
-
-For browser:
-
-    bower install async-watch --save
-
-For Node.js projects
 
     npm install async-watch --save
 
 ## Examples
 
 ```js
-var AsyncWatch = require('async-watch').AsyncWatch; // not needed for browsers
+var AsyncWatch = require('async-watch').AsyncWatch;
 var obj = {}; // creating an empty object
 AsyncWatch(obj, 'a.b.c', function(value){
     console.log('set', value);
